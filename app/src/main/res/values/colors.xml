@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F5297</color>
+    <color name="colorPrimaryDark">#3F5297</color>
+    <color name="colorAccent">#03DA59</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBlack">#252525</color>
+    <color name="colorGrey0">#F6F5F5</color>
+    <color name="colorGrey">#D3D3D3</color>
+    <color name="color_confirmed">#FFE0E6</color>
+    <color name="color_new_deaths">#dbdbdd</color>
+    <color name="color_active">#ddedff</color>
+    <color name="color_deaths">#dbdbdd</color>
+    <color name="color_recovered">#E3F5E9</color>
+    <color name="color_total_recovered">#C5E4D0</color>
+
+
+    <color name="color_confirmed_text">#C83D5C</color>
+    <color name="color_new_deaths_text">#dbdbdd</color>
+    <color name="color_active_text">#1079E2</color>
+    <color name="color_deaths_text">#343434</color>
+    <color name="color_recovered_text">#45A367</color>
+    <color name="color_total_recovered_text">#C5E4D0</color>
+
+    <color name="colorRed">#F44336</color>
+</resources>

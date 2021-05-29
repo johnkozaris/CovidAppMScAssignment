@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_home"
+        android:enabled="true"
+        android:icon="@drawable/ic_home_bottom"
+        android:title="Home"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_scan"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_nfc_24"
+        android:title="Scan"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/menu_profile"
+        android:enabled="true"
+        android:icon="@drawable/ic_baseline_account_circle_24"
+        android:title="My Profile"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/menu_search"
+        android:enabled="true"
+        android:icon="@drawable/ic_search_earth"
+        android:title="Search"
+        app:showAsAction="ifRoom" />
+</menu>

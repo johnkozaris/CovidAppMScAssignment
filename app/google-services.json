@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "389707556835",
+    "project_id": "covidpass-f4919",
+    "storage_bucket": "covidpass-f4919.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:389707556835:android:0cadbe53db1a6fb74262d6",
+        "android_client_info": {
+          "package_name": "eu.kozaris.covidApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "389707556835-kiv5q5rnsalps5h5khp7j03ru63o5k89.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAofHqtah2HmDrg4dhS7aVO5qpYZHhYj7I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "389707556835-kiv5q5rnsalps5h5khp7j03ru63o5k89.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
