@@ -7,21 +7,38 @@
     android:fillViewport="true"
     tools:context=".fragment.ProfileFragment">
 
+    <ImageView
+        android:id="@+id/imageView"
+
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="16dp"
+        android:cropToPadding="false"
+        android:src="@drawable/rounded_titel"
+        app:layout_constraintBottom_toTopOf="@+id/textView_myStatus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/rounded_titel" />
+
     <TextView
         android:id="@+id/textViewLocationLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/graphikbold"
         android:text="Location:"
+        android:textColor="@color/colorWhite"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewPhone" />
 
     <ImageView
         android:id="@+id/imageView_myStatus"
-        android:layout_width="101dp"
-        android:layout_height="99dp"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
         android:layout_marginTop="16dp"
         android:src="@drawable/unprotected_emblemasset"
         app:layout_constraintEnd_toEndOf="parent"
@@ -33,8 +50,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
+        android:fontFamily="@font/graphikregular"
         android:text="My Status"
-        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textColor="@color/colorBlack"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewLocationLabel" />
@@ -44,8 +63,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/graphikbold"
         android:text="Name:"
+        android:textColor="@color/colorWhite"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -56,7 +77,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:fontFamily="@font/graphikbold"
         android:text="Phone: "
+        android:textColor="@color/colorWhite"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewNameLabel" />
@@ -66,7 +89,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:fontFamily="@font/graphikregular"
         android:text="Ioannis Kozaris"
+        android:textColor="@color/colorWhite"
         app:layout_constraintStart_toEndOf="@+id/textViewNameLabel"
         app:layout_constraintTop_toTopOf="@+id/textViewNameLabel" />
 
@@ -75,7 +100,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:fontFamily="@font/graphikregular"
         android:text="69433333"
+        android:textColor="@color/colorWhite"
         app:layout_constraintStart_toEndOf="@+id/textViewPhone"
         app:layout_constraintTop_toTopOf="@+id/textViewPhone" />
 
@@ -84,29 +111,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:fontFamily="@font/graphikregular"
         android:text="Greece"
+        android:textColor="@color/colorWhite"
         app:layout_constraintStart_toEndOf="@+id/textViewLocationLabel"
         app:layout_constraintTop_toTopOf="@+id/textViewLocationLabel" />
-
-    <ImageButton
-        android:id="@+id/imageButton"
-        style="@android:style/Widget.DeviceDefault.Light.ImageButton"
-        android:layout_width="86dp"
-        android:layout_height="73dp"
-        android:layout_marginBottom="16dp"
-        android:src="@drawable/nfc_scan_tag"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView_myStatus" />
 
     <TextView
         android:id="@+id/textViewTagScanDescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
+        android:layout_marginTop="32dp"
         android:text="Click to Allow NFC Scanning"
-        app:layout_constraintBottom_toTopOf="@+id/imageButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView_myStatus" />
+
+    <Button
+        android:id="@+id/buttonAllowScan"
+        style="@style/FirebaseUI.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableStart="@drawable/ic_baseline_nfc_24"
+        android:drawablePadding="12dp"
+        android:padding="18dp"
+        android:text="Allow"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTagScanDescription" />
 </androidx.constraintlayout.widget.ConstraintLayout>

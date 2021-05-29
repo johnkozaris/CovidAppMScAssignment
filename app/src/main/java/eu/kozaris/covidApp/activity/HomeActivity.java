@@ -2,6 +2,7 @@ package eu.kozaris.covidApp.activity;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.drawable.Drawable;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -35,15 +36,17 @@ import eu.kozaris.covidApp.fragment.SearchFragment;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-public class HomeActivity extends AppCompatActivity implements NfcAdapter.CreateNdefMessageCallback,
-        NfcAdapter.OnNdefPushCompleteCallback {
+import static android.nfc.NdefRecord.createMime;
+
+public class HomeActivity extends AppCompatActivity implements  ScanFragment.OnScanPass{
+
+    public static final String MIME_TEXT_PLAIN = "text/plain";
 
     BottomNavigationView bottomNavigation;
     TextView txtActionTitle;
     EditText edSearch;
     LinearLayout lvlSearch;
     AppBarLayout appBarLayout;
-
     NfcAdapter mAdapter;
     PendingIntent mPendingIntent;
 
@@ -56,52 +59,48 @@ public class HomeActivity extends AppCompatActivity implements NfcAdapter.Create
         edSearch=findViewById(R.id.ed_search);
         lvlSearch=findViewById(R.id.lvl_search);
         appBarLayout=findViewById(R.id.appBarLayout);
-
         lvlSearch.setVisibility(View.GONE);
         callFragment(new HomeFragment());
         addTextWatcher();
 
-        bottomNavigation.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int itemId = item.getItemId();
-                if (itemId == R.id.menu_home) {
-                    lvlSearch.setVisibility(View.GONE);
-                    Drawable img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_home, null);
-                    assert img != null;
-                    img.setBounds(0, 0, 60, 60);
-                    txtActionTitle.setCompoundDrawables(img, null, null, null);
-                    txtActionTitle.setText("Home");
-                    callFragment(new HomeFragment());
-                } else if (itemId == R.id.menu_profile) {
-                    Drawable img;
-                    lvlSearch.setVisibility(View.GONE);
-                    txtActionTitle.setText("My Profile");
-                    img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_account_circle_24, null);
-                    assert img != null;
-                    img.setBounds(0, 0, 60, 60);
-                    txtActionTitle.setCompoundDrawables(img, null, null, null);
-                    callFragment(new ProfileFragment());
-                } else if (itemId == R.id.menu_search) {
-                    Drawable img;
-                    callFragment(new SearchFragment());
-                    lvlSearch.setVisibility(View.VISIBLE);
-                    txtActionTitle.setText("Search");
-                    img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_search_earth_white, null);
-                    assert img != null;
-                    img.setBounds(0, 0, 60, 60);
-                    txtActionTitle.setCompoundDrawables(img, null, null, null);
-                } else if (itemId == R.id.menu_scan) {
-                    Drawable img;
-                    lvlSearch.setVisibility(View.GONE);
-                    txtActionTitle.setText("Scan");
-                    img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_nfc_24, null);
-                    img.setBounds(0, 0, 60, 60);
-                    txtActionTitle.setCompoundDrawables(img, null, null, null);
-                    callFragment(new ScanFragment());
-                }
-                return true;
+        bottomNavigation.setOnNavigationItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.menu_home) {
+                lvlSearch.setVisibility(View.GONE);
+                Drawable img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_home, null);
+                assert img != null;
+                img.setBounds(0, 0, 60, 60);
+                txtActionTitle.setCompoundDrawables(img, null, null, null);
+                txtActionTitle.setText("Home");
+                callFragment(new HomeFragment());
+            } else if (itemId == R.id.menu_profile) {
+                Drawable img;
+                lvlSearch.setVisibility(View.GONE);
+                txtActionTitle.setText("My Profile");
+                img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_account_circle_24, null);
+                assert img != null;
+                img.setBounds(0, 0, 60, 60);
+                txtActionTitle.setCompoundDrawables(img, null, null, null);
+                callFragment(new ProfileFragment());
+            } else if (itemId == R.id.menu_search) {
+                Drawable img;
+                callFragment(new SearchFragment());
+                lvlSearch.setVisibility(View.VISIBLE);
+                txtActionTitle.setText("Search");
+                img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_search_earth_white, null);
+                assert img != null;
+                img.setBounds(0, 0, 60, 60);
+                txtActionTitle.setCompoundDrawables(img, null, null, null);
+            } else if (itemId == R.id.menu_scan) {
+                Drawable img;
+                lvlSearch.setVisibility(View.GONE);
+                txtActionTitle.setText("Scan");
+                img = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_baseline_nfc_24, null);
+                img.setBounds(0, 0, 60, 60);
+                txtActionTitle.setCompoundDrawables(img, null, null, null);
+                callFragment(new ScanFragment());
             }
+            return true;
         });
 
         mAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -152,7 +151,6 @@ public class HomeActivity extends AppCompatActivity implements NfcAdapter.Create
             finish();
         } else {
             bottomNavigation.setSelectedItemId(R.id.menu_home);
-
         }
 
     }
@@ -170,77 +168,64 @@ public class HomeActivity extends AppCompatActivity implements NfcAdapter.Create
     protected void onResume() {
         super.onResume();
         if (mAdapter != null) {
-            mAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
+            enableForegroundDispatch(this,mAdapter);
         }
 
     }
+
+    @Override
+    public void OnScanPass(String data) {
+        Intent intent = new Intent(this, BeamActivity.class);
+        intent.putExtra(BeamActivity.IS_RECEIVER, true);
+        startActivity(intent);
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-        GetDataFromTag(tag, intent);
-
+        processIntent(intent);
     }
 
-    private void GetDataFromTag(Tag tag, Intent intent) {
-        Ndef ndef = Ndef.get(tag);
-        try {
-            ndef.connect();
-//            txtType.setText(ndef.getType().toString());
-//            txtSize.setText(String.valueOf(ndef.getMaxSize()));
-//            txtWrite.setText(ndef.isWritable() ? "True" : "False");
-            Parcelable[] messages = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
-            if (messages != null) {
-                NdefMessage[] ndefMessages = new NdefMessage[messages.length];
-                for (int i = 0; i < messages.length; i++) {
-                    ndefMessages[i] = (NdefMessage) messages[i];
-                }
-                NdefRecord record = ndefMessages[0].getRecords()[0];
 
-                byte[] payload = record.getPayload();
-                String text = new String(payload);
-                Log.e("tag", "vahid" + text);
-                ndef.close();
+    void processIntent(Intent intent) {
+        String action = intent.getAction();
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+            Parcelable[] parcelables = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 
-            }
-        } catch (Exception e) {
-            Toast.makeText(getApplicationContext(), "Cannot Read From Tag.", Toast.LENGTH_LONG).show();
+            NdefMessage inNdefMessage = (NdefMessage) parcelables[0];
+            NdefRecord[] inNdefRecords = inNdefMessage.getRecords();
+            NdefRecord ndefRecord_0 = inNdefRecords[0];
+
+            String inMessage = new String(ndefRecord_0.getPayload());
+            this.txtActionTitle.setText(inMessage);
         }
     }
+    public void enableForegroundDispatch(AppCompatActivity activity, NfcAdapter adapter) {
+
+        // here we are setting up receiving activity for a foreground dispatch
+        // thus if activity is already started it will take precedence over any other activity or app
+        // with the same intent filters
 
 
-    public static final String MIME_TEXT_PLAIN = "text/plain";
-    private NfcActivity activity;
+        final Intent intent = new Intent(activity.getApplicationContext(), activity.getClass());
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
-    public HomeActivity(NfcActivity activity) {
-        this.activity = activity;
-    }
-    public HomeActivity( ) {
+        //
+        final PendingIntent pendingIntent = PendingIntent.getActivity(activity.getApplicationContext(), 0, intent, 0);
 
-    }
+        IntentFilter[] filters = new IntentFilter[1];
+        String[][] techList = new String[][]{};
 
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent event) {
-        // creating outcoming NFC message with a helper method
-        // you could as well create it manually and will surely need, if Android version is too low
-        String outString = "";
-            byte[] outBytes = outString.getBytes();
-          NdefRecord outRecord = NdefRecord.createMime(MIME_TEXT_PLAIN, outBytes);
-//
-        return new NdefMessage(outRecord);
-    }
+        filters[0] = new IntentFilter();
+        filters[0].addAction(NfcAdapter.ACTION_NDEF_DISCOVERED);
+        filters[0].addCategory(Intent.CATEGORY_DEFAULT);
+        try {
+            filters[0].addDataType(MIME_TEXT_PLAIN);
+        } catch (IntentFilter.MalformedMimeTypeException ex) {
+            throw new RuntimeException("Check your MIME type");
+        }
 
-    @Override
-    public void onNdefPushComplete(NfcEvent event) {
-        // onNdefPushComplete() is called on the Binder thread, so remember to explicitly notify
-        // your view on the UI thread
-        activity.signalResult();
-    }
-
-    public interface NfcActivity {
-        String getOutgoingMessage();
-
-        void signalResult();
+        adapter.enableForegroundDispatch(activity, pendingIntent, filters, techList);
     }
 }

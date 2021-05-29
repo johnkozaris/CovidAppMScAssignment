@@ -1,6 +1,7 @@
 package eu.kozaris.covidApp.fragment;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -16,6 +19,8 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.jetbrains.annotations.NotNull;
 
 import eu.kozaris.covidApp.R;
 
@@ -30,15 +35,15 @@ import java.util.Map;
 public class ScanFragment extends Fragment {
 
     private static final String TAG= "ScanFragment";
-
+    OnScanPass scanPasser;
 
     public ScanFragment() {
         // Required empty public constructor
     }
 
-    public static ScanFragment scanFragment;
+    public  ScanFragment scanFragment;
 
-    public static ScanFragment getInstance() {
+    public  ScanFragment getInstance() {
         return scanFragment;
     }
 
@@ -80,49 +85,30 @@ public class ScanFragment extends Fragment {
         }
     }
 
-
+    ImageView scanButton;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_scan, container, false);
         scanFragment = this;
-        if (Utils.internetCheck(requireActivity())) {
-            startActivity(new Intent(getActivity(), InternetActivity.class));
-            requireActivity().finish();
-        }
-
-
+        scanButton = view.findViewById(R.id.imageViewScan);
+        scanButton.setOnClickListener(v -> scanPasser.OnScanPass("test"));
         return view;
     }
 
-    void doNFCScan(){
 
-    }
-    void saveContactPoint(){
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Create a new user with a first and last name
-        Map<String, Object> contactPoint = new HashMap<>();
-        contactPoint.put("tagID", 123);
-        contactPoint.put("location", "Thessaloniki");
-        contactPoint.put("covidStatus", false);
-        db.collection("contactPoints")
-                .add(contactPoint)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error adding document", e);
-                        //TODO Alexandre we probably need to add some kind of local save method to fire when we can connect to DB. I thinks its out of scope for te assignment
-                    }
-                });
+    @Override
+    public void onAttach(@NonNull @NotNull Context context) {
+        super.onAttach(context);
+        scanPasser = (OnScanPass)context;
     }
 
 
 
+
+
+    public interface OnScanPass {
+        public void OnScanPass(String data);
+    }
 }

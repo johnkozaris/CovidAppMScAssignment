@@ -21,30 +21,21 @@
         android:networkSecurityConfig="@xml/network_config"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".activity.InternetActivity" />
-        <activity
-            android:name=".activity.HomeActivity"
-            android:theme="@style/AppTheme">
-            <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+        <activity android:name=".activity.BeamActivity">
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="application/vnd.com.example.android.beam" />
+                <data android:mimeType="application/eu.kozaris.covidapp.beam" />
             </intent-filter>
         </activity>
+        <activity android:name=".activity.InternetActivity" />
         <activity
-            android:name=".activity.MainActivity"
-            android:theme="@style/AppTheme">
+            android:name=".activity.HomeActivity">
+        </activity>
+        <activity
+            android:name=".activity.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
