@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+//This class Just checks for internet Connection
+//IT is used in multiple fragments
 public class Utils {
 
     public static boolean internetCheck(Context context) {

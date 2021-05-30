@@ -6,6 +6,9 @@ import android.os.Bundle;
 
 import eu.kozaris.covidApp.R;
 
+/**
+ * The only use of this is to notify that there is no internet and not let the user continue
+ */
 public class InternetActivity extends AppCompatActivity {
 
     @Override

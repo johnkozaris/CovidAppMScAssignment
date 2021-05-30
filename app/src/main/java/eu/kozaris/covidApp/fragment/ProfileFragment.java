@@ -51,6 +51,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
         // Required empty public constructor
     }
 
+    //Boilerplate in case we need to call Fragment with vars
     public static ProfileFragment newInstance() {
         ProfileFragment fragment = new ProfileFragment();
         Bundle args = new Bundle();
@@ -61,13 +62,13 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+        //Inflate the views and set this fragment as their event listener
         recyclerViewContacts = view.findViewById(R.id.recyclerViewContacts);
         recyclerViewContacts.setLayoutManager(new LinearLayoutManager(requireActivity()));
         isUserInfected = view.findViewById(R.id.switchInfected);
@@ -76,18 +77,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
         textViewLogOut.setOnClickListener(this);
         buttonAllowScan=view.findViewById(R.id.buttonAllowScan);
         buttonAllowScan.setOnClickListener(this);
-
         textViewName = view.findViewById(R.id.textViewName);
         textViewLocation = view.findViewById(R.id.textView8);
         textViewPhone = view.findViewById(R.id.textViewPhone);
         FirebaseUser user =FirebaseAuth.getInstance().getCurrentUser();
-
+        //If there is a user set his info in the UI , else leave the defaults
         if (user!=null){
             textViewName.setText(user.getDisplayName());
+            //We could get the location from GPS but this is out of scope for the assignment
             textViewLocation.setText("Thessaloniki");
             textViewPhone.setText(user.getPhoneNumber());
         }
-
+        //Get the contact points from firebase database
         readContactPoints();
         return view;
     }
@@ -97,16 +98,18 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
        sendChangedStatus(1500,"Thessaloniki",isChecked);
     }
 
+
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.textViewLogOut:
+                //Logout is clicked logout the user and start the MainActivity with a clear backStack
+
                 try {
                     FirebaseAuth.getInstance().signOut();
                 }catch (Exception e){
                     Log.e(TAG, "Sign out Error ");
                 }
-
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -115,6 +118,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
                 startActivity(intent);
                 break;
             case R.id.buttonAllowScan:
+                //Start a beam activity as an NFC message Sender
                 Intent beamIntent = new Intent(requireActivity(),BeamActivity.class);
                 startActivity(beamIntent);
                 break;
@@ -124,26 +128,34 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
 
     }
 
-    //TODO this needs to save all the contact points
-    //TODO then we need to querry all found contact points for covid status
+    /**
+     * Reads all the contact points that the user has saved in Firestore
+     * and calls searchInContact points to search for infected
+     */
     void readContactPoints(){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         ArrayList<String> contactPointsIDs = new ArrayList<>();
         ArrayList<String> contactPointsLocations = new ArrayList<>();
         ArrayList<String> contactPointsStatuses = new ArrayList<>();
         db.collection("contactPoints")
+                //Query for the document contact points, we could probably add a 15 day limit to this query in the future
                 .whereEqualTo("myID", "1500")
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        //Go through the Firestore Results
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             Log.d(TAG, document.getId() + " => " + document.getData());
+                            //Get the contact point info and store it to local lists
                             contactPointsIDs.add(document.getData().get("tagID").toString());
                             contactPointsLocations.add(document.getData().get("location").toString());
                             contactPointsStatuses.add(document.getData().get("covidStatus").toString());
                         }
+                        //Inform the adapter that there are new list to use in the Recent contacts RecyclerView
                         adapter = new ContactsAdapter(requireActivity(), contactPointsIDs,contactPointsLocations,contactPointsStatuses);
                         recyclerViewContacts.setAdapter(adapter);
+
+                        //Search for infected tags
                         searchInContactPoints(contactPointsIDs);
                     } else {
                         Log.d(TAG, "Error getting documents: ", task.getException());
@@ -151,21 +163,29 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
                 });
 
     }
-    void searchInContactPoints(ArrayList<String> contactPoints){
+
+    /**
+     * Search a list of contact points for infected
+     * Gets the tag ids and uses them to check if a user with myID = tagID has set his covid status to true
+     * @param contactPointsIds List of contact point IDs
+     */
+    void searchInContactPoints(ArrayList<String> contactPointsIds){
         ArrayList<String> infectedContactPoints = new ArrayList<>();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        for (String contactPoint : contactPoints) {
+        for (String contactPointID : contactPointsIds) {
             db.collection("contactPoints")
-                    .whereEqualTo("myID", contactPoint)
+                    .whereEqualTo("myID", contactPointID)
                     .whereEqualTo("covidStatus", true)
                     .get()
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Log.d(TAG, document.getId() + " => " + document.getData());
+                                //if this documents contains infected contact points add the to the infected list
                                 infectedContactPoints.add(document.get("tagID").toString());
                             }
                             if (!task.getResult().isEmpty()){
+                                //If the results is NOT empty then an infected contact point has been found notify the user
                                 Toast.makeText(getActivity(), "YOU CAME IN CONTACT WITH AN INFECTED PERSON", Toast.LENGTH_LONG).show();
                             }
                         } else {
@@ -176,9 +196,14 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
 
     }
 
+    /**
+     * Toogle my Status as infected by COVID and save the info in FireStore
+     * @param myNFCTagId my unique ID
+     * @param myLocation my current Location
+     * @param status my covid infected status
+     */
     void sendChangedStatus(int myNFCTagId,String myLocation,boolean status){
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        // Create a new user with a first and last name
         Map<String, Object> contactPoint = new HashMap<>();
         contactPoint.put("myID", myNFCTagId);
         contactPoint.put("tagID", myNFCTagId);
@@ -189,7 +214,7 @@ public class ProfileFragment extends Fragment implements View.OnClickListener, C
                 .addOnSuccessListener(documentReference -> Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId()))
                 .addOnFailureListener(e -> {
                     Log.w(TAG, "Error adding document", e);
-                    //TODO Alexandre we probably need to add some kind of method to change this entry to not infected
+                    //TODO Alexandre we probably need to add some kind of method to change this entry to not infected and not add a new every time
                 });
     }
 

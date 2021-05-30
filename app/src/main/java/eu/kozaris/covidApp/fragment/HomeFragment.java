@@ -46,10 +46,16 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
 
     Summary summary;
     public  HomeFragment homeFragment;
+
+    //This is boilerplate
     public  HomeFragment getInstance() {
         return homeFragment;
     }
 
+    /**
+     * This method changes between Greek and global data and fills the appropriate textviews
+     * @param isType if true then greece is selected else global is selected
+     */
     private void setData(boolean isType) {
         Locale currentLocale = ConfigurationCompat.getLocales(getResources().getConfiguration()).get(0);
         if (isType) {
@@ -67,12 +73,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
 
     }
-
     public HomeFragment() {
         // Required empty public constructor
     }
 
-
+    //This is also boilerplate in case we need to pass vars when calling the fragment
     public static HomeFragment newInstance() {
         HomeFragment fragment = new HomeFragment();
         Bundle args = new Bundle();
@@ -83,7 +88,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -92,6 +96,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         homeFragment = this;
+        //Inflate Views
         txtGreece = view.findViewById(R.id.txt_greece);
         txtGlobal = view.findViewById(R.id.txt_global);
         txtAffected = view.findViewById(R.id.txt_affected);
@@ -102,14 +107,20 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         txtLiveLabel = view.findViewById(R.id.txt_live_label);
         imgDot = view.findViewById(R.id.img_dot);
 
+        //These textviews change the API Results from Greece to Global
+        //PS The greek Results are not correct from the API we chose
         txtGreece.setOnClickListener(this);
         txtGlobal.setOnClickListener(this);
+
         setContain();
         return view;
     }
 
+
     private void setContain() {
+        //This summary is a JSON representes as a Java Class this is how retrofit works
         summary = new Summary();
+        //Check for internet connection
         if (Utils.internetCheck(requireContext())) {
             startActivity(new Intent(getActivity(), InternetActivity.class));
             requireActivity().finish();
@@ -118,6 +129,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         blink();
     }
 
+    /**
+     * This method starts a thread that makes the red dot net to Live Statistics blink
+     */
     private void blink() {
         final Handler handler = new Handler();
         new Thread(() -> {
@@ -138,6 +152,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }).start();
     }
 
+    //Listens to textview click to change from Global to Greece
    @Override
     public void onClick(View view) {
         int id = view.getId();
@@ -156,21 +171,27 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * Gets data from the API using Retrofit
+     */
     private void getSummaryData() {
-
-        /*Create handle for the RetrofitInstance interface*/
+        //Create handle for the RetrofitInstance interface
         GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
         Call<Summary> call = service.getAllCountries();
+        //This is the callback in which we receive the data for ALL the countries
         call.enqueue(new Callback<Summary>() {
             @Override
             public void onResponse(@NotNull Call<Summary> call, @NotNull Response<Summary> response) {
-
                 if (response.body() != null) {
-                    Log.e("Response", "-->" + response.body().getGlobal().getNewConfirmed());
+                    Log.e("Response", ":" + response.body().getGlobal().getNewConfirmed());
                 }
                 if (response.body() != null) {
+                    //get all the countries data from the response
                     summary.setGlobal(response.body().getGlobal());
+
+                    //Go through all the countries
                     for (int i = 0; i <= response.body().getCountries().size(); i++) {
+                        //When Greece is found
                         if (response.body().getCountries().get(i).getCountry().equalsIgnoreCase("Greece")) {
                             CountryInd country = new CountryInd();
                             country.setCountry(response.body().getCountries().get(i).getCountry());
@@ -180,16 +201,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                             country.setTotalConfirmed(response.body().getCountries().get(i).getTotalConfirmed());
                             country.setTotalDeaths(response.body().getCountries().get(i).getTotalDeaths());
                             country.setTotalRecovered(response.body().getCountries().get(i).getTotalRecovered());
+                            //set the country as the selectected country for home
                             summary.setCountryTemp(country);
+                            //inform the UI to change the textviews
                             setData(true);
                             return;
                         }
                     }
-
-
                 }
             }
-
             @Override
             public void onFailure(@NotNull Call<Summary> call, @NotNull Throwable t) {
                 Log.e("error", "-> " + t.getMessage());

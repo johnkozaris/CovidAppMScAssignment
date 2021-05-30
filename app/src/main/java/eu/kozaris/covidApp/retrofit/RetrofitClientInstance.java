@@ -5,6 +5,9 @@ import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
+/**
+ * A retrofit client connecting to a specific API and making HTTP calls in this case "https://api.covid19api.com"
+ */
 public class RetrofitClientInstance {
     private static final String BASE_URL = "https://api.covid19api.com";
     public static Retrofit getRetrofitInstance() {
@@ -15,6 +18,7 @@ public class RetrofitClientInstance {
 
         return new Retrofit.Builder()
             .baseUrl(BASE_URL)
+                //Retrofit will use GSON lib to convert Json to Java object
             .addConverterFactory(GsonConverterFactory.create())
             .client(httpClient.build())
             .build();

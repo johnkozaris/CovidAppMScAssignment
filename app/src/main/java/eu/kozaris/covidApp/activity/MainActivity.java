@@ -26,16 +26,16 @@ import java.util.List;
 
 import eu.kozaris.covidApp.R;
 
+/**
+ * This activity is the Launcher it logs the user in using Firebase Auth
+ * If you want to bypass the login proccess click on the app name textview
+ */
 public class MainActivity extends AppCompatActivity implements ActivityResultCallback<ActivityResult> {
-
+    //Permission IDs
     private static final int RC_PERM_NFC = 2;
     private static final int RC_PERM_INTERNET = 3;
     private static final int RC_PERM_NETWORK_CH = 4;
     private static final int RC_PERM_NETWORK_AC = 5;
-
-    public static final String EXTRA_NAME = "profile_extra_name";
-    public static final String EXTRA_PHONE = "profile_extra_phone";
-    public static final String EXTRA_MAIL = "profile_extra_mail";
 
     ActivityResultLauncher<Intent> someActivityResultLauncher;
     List<AuthUI.IdpConfig> providers;
@@ -44,19 +44,23 @@ public class MainActivity extends AppCompatActivity implements ActivityResultCal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //Inflate Views
         Button signInButton = findViewById(R.id.buttonSignIn);
         TextView title = findViewById(R.id.textViewLoginTitle);
+
+        //Bypass the login process by clicking the Textview Title. This is for testing purposes
         title.setOnClickListener(v -> {
             Intent intent = new Intent(this.getApplicationContext(), HomeActivity.class);
             startActivity(intent);
         });
+
         // Choose authentication providers
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                 new AuthUI.IdpConfig.EmailBuilder().build());
 
+        //Launch the firebase Auth UI activity and set this activity as a callback to get the result of the login proccess this will happen in the OnActivityResult
         someActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this);
-
         signInButton.setOnClickListener(v -> someActivityResultLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers)
                 .build()));
     }
@@ -70,27 +74,38 @@ public class MainActivity extends AppCompatActivity implements ActivityResultCal
         checkPermission(Manifest.permission.CHANGE_NETWORK_STATE, RC_PERM_NETWORK_AC);
     }
 
+    /**
+     * Check if we have permmisiion and if we dont ask for permissions
+     *
+     * @param permission  The permission to ask
+     * @param requestCode Permission id
+     */
     public void checkPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
         }
     }
 
+    /**
+     * The Firebase Auth UI finished
+     *
+     * @param result the result code of the Auth UI activity
+     */
     @Override
     public void onActivityResult(ActivityResult result) {
         if (result.getResultCode() == Activity.RESULT_OK) {
+            //Firebase instance is a singleton and can be called from anywhere , here we will only check if the login was a success
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             Intent intent = new Intent(this.getApplicationContext(), HomeActivity.class);
             if (user != null) {
-                intent.putExtra(EXTRA_NAME, user.getDisplayName());
-                intent.putExtra(EXTRA_MAIL, user.getEmail());
-                intent.putExtra(EXTRA_PHONE, user.getPhoneNumber());
-
+                //The login is a success go to the HomeActivity
                 startActivity(intent);
             } else {
+                //The user probably canceled
                 Toast.makeText(this, "Login Failed try again", Toast.LENGTH_SHORT).show();
             }
         } else {
+            //The login proccess resulted in an error
             Toast.makeText(this, "Login Failed try again", Toast.LENGTH_SHORT).show();
         }
     }

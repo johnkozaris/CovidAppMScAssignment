@@ -20,6 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * This adapter fills the Country Recycler View in the Search fragment
+ * It uses a country card as items in the recycler View
+ */
 public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.MyViewHolder>
         implements Filterable {
 
@@ -68,17 +72,15 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.MyViewHo
     @Override
     public void onBindViewHolder(MyViewHolder viewHolder, final int position) {
         final Country country = CountryListFiltered.get(position);
-        //TODO I cant ge the context here so that i can get a Locale
+        //TODO The locale call is probably useless as we wont move the string to the xml. But keeps android studio from complaining
         Locale currentLocale = ConfigurationCompat.getLocales(callingContext.getResources().getConfiguration()).get(0);
-        viewHolder.txtConfirmed.setText(String.format(country.getNewConfirmed().toString(),currentLocale));
-        viewHolder.txtNewDeaths.setText(String.format(country.getNewDeaths().toString(),currentLocale));
-        viewHolder.txtActive.setText(String.format(country.getTotalConfirmed().toString(),currentLocale));
-        viewHolder.txtDeaths.setText(String.format(country.getTotalDeaths().toString(),currentLocale));
-        viewHolder.txtRecovered.setText(String.format(country.getNewRecovered().toString(),currentLocale));
-        viewHolder.txtTotalRecovered.setText(String.format(country.getTotalRecovered().toString(),currentLocale));
+        viewHolder.txtConfirmed.setText(String.format(country.getNewConfirmed().toString(), currentLocale));
+        viewHolder.txtNewDeaths.setText(String.format(country.getNewDeaths().toString(), currentLocale));
+        viewHolder.txtActive.setText(String.format(country.getTotalConfirmed().toString(), currentLocale));
+        viewHolder.txtDeaths.setText(String.format(country.getTotalDeaths().toString(), currentLocale));
+        viewHolder.txtRecovered.setText(String.format(country.getNewRecovered().toString(), currentLocale));
+        viewHolder.txtTotalRecovered.setText(String.format(country.getTotalRecovered().toString(), currentLocale));
         viewHolder.txtCountry.setText(country.getCountry());
-
-
     }
 
     @Override
@@ -86,9 +88,15 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.MyViewHo
         return CountryListFiltered.size();
     }
 
+    /**
+     * we use this to get a filtered list from the big countries list accordning to what the user typed in the search edit text
+     *
+     * @return A filteres list to the Search Fragment
+     */
     @Override
     public Filter getFilter() {
         return new Filter() {
+            // filter according to the charachters received
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String charString = charSequence.toString();
@@ -97,8 +105,8 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.MyViewHo
                 } else {
                     List<Country> filteredList = new ArrayList<>();
                     for (Country row : CountryList) {
-                        // name match condition. this might differ depending on your requirement
-                        // here we are looking for name or phone number match
+
+                        // Match the charachters that the user types to the whole list and get the filtered result
                         if (row.getCountry().toLowerCase().contains(charString.toLowerCase())) {
                             filteredList.add(row);
                         }
@@ -111,9 +119,11 @@ public class CountryAdapter extends RecyclerView.Adapter<CountryAdapter.MyViewHo
                 filterResults.values = CountryListFiltered;
                 return filterResults;
             }
+
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+                //TODO this is an unchecked cast but i could not find any other way to do it
                 CountryListFiltered = (ArrayList<Country>) filterResults.values;
                 notifyDataSetChanged();
             }

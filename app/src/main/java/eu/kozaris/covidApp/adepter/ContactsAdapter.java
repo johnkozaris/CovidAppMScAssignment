@@ -15,6 +15,9 @@ import java.util.List;
 
 import eu.kozaris.covidApp.R;
 
+/**
+ * This adapter takes Contact items and fills the recent contacts recyclerview with a list of contact points
+ */
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
 
     private final List<String> mListIds;
@@ -22,7 +25,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
     private final List<String> mListStatuses;
     private final LayoutInflater mInflater;
 
-    //List data is passed into the constructor
+    //Lists data is passed (from Firestore probably) into the constructor
   public  ContactsAdapter(Context context, List<String> listIds,List<String> listLocations,List<String> listStatuses) {
         this.mInflater = LayoutInflater.from(context);
         this.mListIds = listIds;
@@ -30,7 +33,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         this.mListStatuses = listStatuses;
     }
 
-    // inflates the row layout from xml when needed
+    //This Inflate the row layout from the xml
     @NotNull
     @Override
     public ViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
@@ -38,7 +41,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
+    // This binds the data to the TextViews in each row
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String id = mListIds.get(position);
@@ -46,6 +49,8 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         String status = mListStatuses.get(position);
         holder.myTextViewIDs.setText(id);
         holder.myTextViewLocations.setText(location);
+
+        //The status variable will come as true or false, so we make this bool human readable for the textview
         if (status.equals("true")){
             holder.myTextViewStatuses.setText("Infected");
             holder.myTextViewStatuses.setTextColor(Color.RED);
@@ -56,14 +61,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         }
     }
 
-    // total number of rows
+    // Total number of rows in the Recyclerview
     @Override
     public int getItemCount() {
         return mListIds.size();
     }
 
 
-    // stores and recycles views as they are scrolled off screen
+    // Stores and Recycler's views as they are scrolled off screen
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView myTextViewIDs;
         TextView myTextViewLocations;

@@ -2,6 +2,7 @@
 package eu.kozaris.covidApp.models;
 
 import com.google.gson.annotations.SerializedName;
+//This is not a normal class, this is used by Google GSON as a contract or a mapping guide to convert JSON objects to Java Classes
 
 public class Tested {
 

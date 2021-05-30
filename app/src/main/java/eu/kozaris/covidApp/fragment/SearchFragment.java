@@ -37,7 +37,6 @@ public class SearchFragment extends Fragment {
 
     public static SearchFragment searchFragment;
     RecyclerView recyclerView;
-
     CountryAdapter countryAdapter;
     List<Country> countryList;
 
@@ -49,11 +48,9 @@ public class SearchFragment extends Fragment {
         // Required empty public constructor
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -61,12 +58,14 @@ public class SearchFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
-        recyclerView =view.findViewById(R.id.recycler_view);
-        if(Utils.internetCheck(requireActivity())){
+        recyclerView = view.findViewById(R.id.recycler_view);
+
+        //Check for internet connection
+        if (Utils.internetCheck(requireActivity())) {
             startActivity(new Intent(requireActivity(), InternetActivity.class));
             requireActivity().finish();
         }
-        searchFragment=this;
+        searchFragment = this;
         Bundle b = getArguments();
         if (b != null) {
             String keyword = b.getString("search");
@@ -80,28 +79,31 @@ public class SearchFragment extends Fragment {
         return view;
     }
 
+    //The parent activity notified us that the user has typed in the search edit text
     public void getSearch(String key) {
         Log.e("searchKey===", key + "");
-
+        //Use the Filter in the country addapter to filter the list of ALL the countries based on the typed key
         countryAdapter.getFilter().filter(key);
     }
 
+
     private void setContain() {
-        if(Utils.internetCheck(requireActivity())){
-            startActivity(new Intent(requireActivity(), InternetActivity.class));
-            requireActivity().finish();
-        }
+        //Fill the recyclerview with 0 items and link it to the country adapter
         countryList = new ArrayList<>();
         countryAdapter = new CountryAdapter(requireActivity(), countryList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(requireActivity());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(countryAdapter);
+
+        //Use retrofit to get data from the API
         getAllData();
     }
 
+    /**
+     * Use retrofit to get the data from the API
+     */
     private void getAllData() {
-
         /*Create handle for the RetrofitInstance interface*/
         GetDataService service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
         Call<Summary> call = service.getAllCountries();
@@ -112,9 +114,11 @@ public class SearchFragment extends Fragment {
                     Log.e("Response", "-->" + response.body().getGlobal().getNewConfirmed());
                 }
                 if (response.body().getCountries() != null) {
+                    //Add all countries to the list
                     countryList.addAll(response.body().getCountries());
-
+                    //Sort countries by the new confirmed covid cases
                     countryList.sort(new CustomComparator());
+                    //notify the adapter that the dataset has changed and the recyclerview neeeds to change
                     countryAdapter.notifyDataSetChanged();
                 }
             }
@@ -123,16 +127,17 @@ public class SearchFragment extends Fragment {
             public void onFailure(@NotNull Call<Summary> call, @NotNull Throwable t) {
                 Log.e("error", "-> " + t.getMessage());
                 Toast.makeText(getActivity(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
-
             }
         });
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        searchFragment=null;
+        searchFragment = null;
     }
 
+    //Comparator that compares 2 countries based on the confirmed cases
     public static class CustomComparator implements Comparator<Country> {
         @Override
         public int compare(Country o1, Country o2) {
