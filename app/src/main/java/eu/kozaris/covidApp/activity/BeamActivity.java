@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 
 import android.nfc.NdefMessage;
@@ -18,7 +17,6 @@ import android.os.Bundle;
 
 import android.os.Parcelable;
 
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
 import android.widget.TextView;

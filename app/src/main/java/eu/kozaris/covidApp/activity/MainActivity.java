@@ -29,6 +29,10 @@ import eu.kozaris.covidApp.R;
 /**
  * This activity is the Launcher it logs the user in using Firebase Auth
  * If you want to bypass the login proccess click on the app name textview
+ *
+ * IMPORTANT!!!!!!!!!!!
+ * If you build this project in another PC and you cannot use the firebase features, then you need to provide me the SHA1 of your android studio to add it to the allowed list in Firebase
+ * !!!!!!!!!!!!!!!
  */
 public class MainActivity extends AppCompatActivity implements ActivityResultCallback<ActivityResult> {
     //Permission IDs
