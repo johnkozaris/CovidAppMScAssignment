@@ -20,10 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 -optimizationpasses 5
--dump class_files.txt
--printseeds seeds.txt
--printusage unused.txt
--printmapping mapping.txt
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging*/
 
 -allowaccessmodification
@@ -37,13 +33,8 @@
 -dontwarn okhttp3.**
 -dontwarn okio.**
 
--keepclassmembers class * {
-  @android.webkit.JavascriptInterface <methods>;
-  }
 -keepattributes JavascriptInterface
 -keepattributes *Annotation*
--dontwarn com.razorpay.**
--keep class com.razorpay.** {*;}
 -optimizations !method/inlining/*
 -keepclasseswithmembers class * {  public void onPayment*(...);}
 
