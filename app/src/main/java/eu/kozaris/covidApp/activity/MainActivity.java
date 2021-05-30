@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -27,18 +28,29 @@ import eu.kozaris.covidApp.R;
 
 public class MainActivity extends AppCompatActivity implements ActivityResultCallback<ActivityResult> {
 
-private static final int RC_SIGN_IN = 1;
-public static final String EXTRA_NAME = "profile_extra_name";
-public static final String EXTRA_PHONE = "profile_extra_phone";
-public static final String EXTRA_MAIL = "profile_extra_mail";
+    private static final int RC_PERM_NFC = 2;
+    private static final int RC_PERM_INTERNET = 3;
+    private static final int RC_PERM_NETWORK_CH = 4;
+    private static final int RC_PERM_NETWORK_AC = 5;
+
+    public static final String EXTRA_NAME = "profile_extra_name";
+    public static final String EXTRA_PHONE = "profile_extra_phone";
+    public static final String EXTRA_MAIL = "profile_extra_mail";
 
     ActivityResultLauncher<Intent> someActivityResultLauncher;
     List<AuthUI.IdpConfig> providers;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button signInButton= findViewById(R.id.buttonSignIn);
+        Button signInButton = findViewById(R.id.buttonSignIn);
+        TextView title = findViewById(R.id.textViewLoginTitle);
+        title.setOnClickListener(v -> {
+            Intent intent = new Intent(this.getApplicationContext(), HomeActivity.class);
+            startActivity(intent);
+        });
+        // Choose authentication providers
         providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
                 new AuthUI.IdpConfig.EmailBuilder().build());
@@ -47,27 +59,20 @@ public static final String EXTRA_MAIL = "profile_extra_mail";
 
         signInButton.setOnClickListener(v -> someActivityResultLauncher.launch(AuthUI.getInstance().createSignInIntentBuilder().setAvailableProviders(providers)
                 .build()));
-        // Choose authentication providers
-
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        checkPermission(Manifest.permission.NFC,5);
-        checkPermission(Manifest.permission.INTERNET,10);
-        checkPermission(Manifest.permission.ACCESS_NETWORK_STATE,15);
-        checkPermission(Manifest.permission.CHANGE_NETWORK_STATE,20);
+        checkPermission(Manifest.permission.NFC, RC_PERM_NFC);
+        checkPermission(Manifest.permission.INTERNET, RC_PERM_INTERNET);
+        checkPermission(Manifest.permission.ACCESS_NETWORK_STATE, RC_PERM_NETWORK_CH);
+        checkPermission(Manifest.permission.CHANGE_NETWORK_STATE, RC_PERM_NETWORK_AC);
     }
 
-    public void checkPermission(String permission, int requestCode)
-    {
-        // Checking if permission is not granted
+    public void checkPermission(String permission, int requestCode) {
         if (ContextCompat.checkSelfPermission(MainActivity.this, permission) == PackageManager.PERMISSION_DENIED) {
-            ActivityCompat.requestPermissions(MainActivity.this, new String[] { permission }, requestCode);
-        }
-        else {
-            Toast.makeText(MainActivity.this, "Permission already granted", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{permission}, requestCode);
         }
     }
 
@@ -76,20 +81,17 @@ public static final String EXTRA_MAIL = "profile_extra_mail";
         if (result.getResultCode() == Activity.RESULT_OK) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
             Intent intent = new Intent(this.getApplicationContext(), HomeActivity.class);
-//                    assert user != null;
-//                    intent.putExtra(EXTRA_NAME, user.getDisplayName());
-//                    intent.putExtra(EXTRA_MAIL, user.getEmail());
-//                    intent.putExtra(EXTRA_PHONE, user.getPhoneNumber());
+            if (user != null) {
+                intent.putExtra(EXTRA_NAME, user.getDisplayName());
+                intent.putExtra(EXTRA_MAIL, user.getEmail());
+                intent.putExtra(EXTRA_PHONE, user.getPhoneNumber());
 
-            startActivity(intent);
+                startActivity(intent);
+            } else {
+                Toast.makeText(this, "Login Failed try again", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Toast.makeText(this, "Login Failed try again", Toast.LENGTH_SHORT).show();
         }
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        Intent intent = new Intent(this.getApplicationContext(), HomeActivity.class);
-//                    assert user != null;
-//                    intent.putExtra(EXTRA_NAME, user.getDisplayName());
-//                    intent.putExtra(EXTRA_MAIL, user.getEmail());
-//                    intent.putExtra(EXTRA_PHONE, user.getPhoneNumber());
-
-        startActivity(intent);
     }
 }
